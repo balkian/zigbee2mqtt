@@ -1,0 +1,34 @@
+version: '2.1'
+services:
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt
+    container_name: zigbee2mqtt 
+    restart: always
+    volumes:
+      - ./z2m-data/:/app/data/
+    devices:
+      - "/dev/ttyACM0"
+    networks:
+        - hass
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+       - 1883:1883
+       - 9001:9001 
+    networks:
+        - hass
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+  hass:
+    image: homeassistant/home-assistant   
+    ports:
+      - "8123:8123"
+    networks:
+      - hass
+    volumes:
+      - ./hass-config:/config
+      - "/etc/localtime:/etc/localtime:ro"
+networks:
+  hass:
+    driver: overlay
+  
